@@ -95,15 +95,10 @@ def number_of_solutions(indices):
     #store list of probabilities of measuring estimation qubits to be in each of the 16 computational basis states in circuitProbs
     circuitProbs=circuit(indices)
      
-    #find the computational basis state with the highest probability
-    maxProb = circuitProbs[0]
-    maxIndex = 0
-
-    for i in range(1,len(circuitProbs)):
-        if circuitProbs[i] > maxProb:
-            maxProb = circuitProbs[i]
-            maxIndex = i
-
+    """Find the computational basis state with the highest probability.
+    argmax returns the index of the array element with the largest value""" 
+    maxIndex = np.argmax(circuitProbs) 
+            
     theta = maxIndex*3.14159/8
     M = 16*(math.sin(theta/2))**2
 
