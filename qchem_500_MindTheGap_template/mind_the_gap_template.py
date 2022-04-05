@@ -70,7 +70,7 @@ def create_H1(ground_state, beta, H):
     #create a column vector that represents the ground state as a ket
     groundStateKet = np.transpose(np.array([ground_state]))
 
-    #create the projector onto the ground state by using matrix multiplication with the ket |grnd state> & the bar <grnd state|
+    #create the projector onto the ground state by using matrix multiplication with the ket |grnd state> & the bra <grnd state|
     groundStateProjector=np.matmul(groundStateKet,np.array([ground_state]))
    
     #get the matrix form of the Hamiltonian H. Note that sparse_hamiltonian returns a sparse matrix representation of H.
@@ -103,7 +103,7 @@ def excited_state_VQE(H1):
         #start with the state |0101>
         qml.BasisState(np.array([0,1,0,1]), wires=range(num_wires))
         
-        #perform a single excitation that can take |0101> to |0011> by "exciting" qubit 2 to qubit 1
+        #perform a single excitation that can take |0101> to |0011> by "exciting" qubit 1 to qubit 2
         qml.SingleExcitation(theta, wires=[1, 2])
             
     @qml.qnode(dev_H1)
