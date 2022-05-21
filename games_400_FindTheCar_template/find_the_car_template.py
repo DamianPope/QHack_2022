@@ -27,18 +27,17 @@ def find_the_car(oracle):
             1. Effectively, run Deutsch's algorithm with the 2nd qubit as the input & the sol qubit as the output. Do this by preparing the state:
                 |0> (|0> + |1>) (|0> - |1>)
             
-            Case A: If the second qubit is 1 by the end of circuit1, then 00 and 01 have different outputs. So, one of them must be the solution. 
+            Case A: If the second qubit is 1 by the end of circuit, then 00 and 01 have different outputs. So, one of them must be the solution. 
             (As only the solution produces the output of 1.) 
             
-            Case B: If the second qubit is 0 by the end of circuit1, then 00 and 01 produce the same output. 
+            Case B: If the second qubit is 0 by the end of circuit, then 00 and 01 produce the same output. 
             So, neither of them is the solution.
             
-            2. Feed the output of circuit1 into circuit2.
+           2. Essentially, run Deutsch's algorithm again but with the 1st qubit as the input & the initial state (|0> + |1>) |0> (|0> - |1>).
+            CASE A: If the first qubit is 1 at the end of the circuit, then then 00 and 10 have different outputs. So, one of them must be the solution. 
+            CASE B: If the first qubit is 0 by the end of circuit, then 00 and 10 produce the same output. So, neither of them is the solution.
             
-            CIRCUIT2
-            3. If we have Case A, input the state 00 (=0) into the oracle. If the output is 0, then the solution is 1. If it's 1, the solution is 0.
-            
-            4. If we have Case B, input the state 10 (=2) into the oracle. If the output is 0, then the solution is 3. If it's 1, the solution is 2.
+            3. Use logic to process the outputs of the circuits and determine where the car is.
         """
         
         #prepare the input state of |00> + |01>
@@ -57,40 +56,41 @@ def find_the_car(oracle):
         return qml.sample()
 
     @qml.qnode(dev)
-    def circuit2(circuitOneOutput):
+    def circuit2():
         # QHACK #
-        if circuitOneOutput == 0:
-            #The inputs 00 and 01 produce the same output. So, neither of them is the solution.
+       
+        #prepare the input state of |00> + |10>
+        qml.Hadamard(wires=0)
 
-            #Input the state 10 into the oracle
-            qml.PauliX(wires=0)
+        #prepare the sol qubit (3rd qubit) in the state |0> - |1>
+        qml.PauliX(wires="sol")
+        qml.Hadamard(wires="sol")
             
-        else:
-            #00 and 01 produce different outputs. So, one of them is the solution. Inut the state |00> into the oracle.
-            qml.Identity(wires=0)
-
         oracle() 
+        
+        #apply H gate to 1st qubit
+        qml.Hadamard(wires=0)
         
         # QHACK #
         return qml.sample()
 
     sol1 = circuit1()
-    sol2 = circuit2(sol1[1])
+    sol2 = circuit2()
 
     # QHACK #    
     
     # process sol1 and sol2 to determine which door the car is behind.
     
-    if sol1[1] == 1 and sol2[2]==0:
+    if sol1[1] == 1 and sol2[0]==0:
         return 1
 
-    if sol1[1] == 1 and sol2[2]==1:
+    if sol1[1] == 1 and sol2[0]==1:
         return 0
         
-    if sol1[1] == 0 and sol2[2]==0:
+    if sol1[1] == 0 and sol2[0]==0:
         return 3
 
-    if sol1[1] == 0 and sol2[2]==1:
+    if sol1[1] == 0 and sol2[0]==1:
         return 2
     # QHACK #
 
